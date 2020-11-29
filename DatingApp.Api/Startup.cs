@@ -1,3 +1,4 @@
+using AutoMapper;
 using DatingApp.Api.Data;
 using DatingApp.Api.Helpers;
 using DatingApp.Data;
@@ -32,9 +33,13 @@ namespace DatingApp.Api
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"));
             });
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt=> {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             services.AddCors();
+            services.AddAutoMapper(typeof(DatingRepository).Assembly);
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IdatingRepository, DatingRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
