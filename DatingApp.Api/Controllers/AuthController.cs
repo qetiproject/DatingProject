@@ -1,4 +1,5 @@
-﻿using DatingApp.Api.Data;
+﻿using AutoMapper;
+using DatingApp.Api.Data;
 using DatingApp.Api.Dtos;
 using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -20,11 +21,12 @@ namespace DatingApp.Api.Controllers
         private readonly IAuthRepository _repo;
 
         public IConfiguration _config;
-
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private IMapper _mapper;
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
             _repo = repo;
             _config = config;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -38,14 +40,12 @@ namespace DatingApp.Api.Controllers
             if (await _repo.UserExists(userRegisterDto.Username))
                 return BadRequest("Username already exists");
 
-            var userToCreate = new User
-            {
-                UserName = userRegisterDto.Username
-            };
+            var userToCreate = _mapper.Map<User>(userRegisterDto);
 
             var createdUser = await _repo.Register(userToCreate, userRegisterDto.Password);
+            var user = _mapper.Map<UserDetailDto>(createdUser);
 
-            return StatusCode(200);
+            return CreatedAtRoute("GetUser", new { controller = "Users", id = createdUser.Id }, user);
         }
 
         [HttpPost("login")]
