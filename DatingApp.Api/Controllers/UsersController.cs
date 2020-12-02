@@ -26,6 +26,7 @@ namespace DatingApp.Api.Controllers
             _mapper = mapper;
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
@@ -46,6 +47,7 @@ namespace DatingApp.Api.Controllers
             return Ok(userToReturn);
         }
 
+
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
@@ -53,6 +55,7 @@ namespace DatingApp.Api.Controllers
             var userToReturn = _mapper.Map<UserDetailDto>(user);
             return Ok(userToReturn);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateDto userUpdate)
@@ -70,6 +73,7 @@ namespace DatingApp.Api.Controllers
             throw new Exception($"Updating user {id} failed on save");
         }
 
+
         [HttpPost("{id}/like/{recipientId}")]
         public async Task<IActionResult> LikeUser(int id, int recipientId)
         {
@@ -79,12 +83,12 @@ namespace DatingApp.Api.Controllers
             var like = await _repo.GetLike(id, recipientId);
 
             if (like != null)
-                return BadRequest("You already like this user");
+                return BadRequest("You've already liked this user");
 
             if (await _repo.GetUser(recipientId) == null)
                 return NotFound();
 
-            like = new Models.Like
+            like = new Like
             {
                 LikerId = id,
                 LikeeId = recipientId

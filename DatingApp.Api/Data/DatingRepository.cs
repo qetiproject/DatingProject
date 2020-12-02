@@ -1,6 +1,7 @@
 ﻿using DatingApp.Api.Helpers;
 using DatingApp.Api.Models;
 using DatingApp.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace DatingApp.Api.Data
 
             if (userParams.Likes)
             {
-                var userLikes = await GetUserLikes(userParams.UserId, userParams.Likes);
+                var userLikes = await GetUserLikes(userParams.UserId, userParams.Likers);
                 users = users.Where(u => userLikes.Contains(u.Id));
             }
 
@@ -96,6 +97,7 @@ namespace DatingApp.Api.Data
         //error
         private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
         {
+          
             var user = await _context.Users
                 .Include(x => x.Likers)
                 .Include(x => x.Likes)
