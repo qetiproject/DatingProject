@@ -2,7 +2,6 @@
 using DatingApp.Api.Data;
 using DatingApp.Api.Dtos;
 using DatingApp.Api.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -40,10 +39,10 @@ namespace DatingApp.Api.Controllers
             if (await _repo.UserExists(userRegisterDto.Username))
                 return BadRequest("Username already exists");
 
-            var userToCreate = _mapper.Map<User>(userRegisterDto);
+            User userToCreate = _mapper.Map<User>(userRegisterDto);
 
-            var createdUser = await _repo.Register(userToCreate, userRegisterDto.Password);
-            var user = _mapper.Map<UserDetailDto>(createdUser);
+            User createdUser = await _repo.Register(userToCreate, userRegisterDto.Password);
+            UserDetailDto user = _mapper.Map<UserDetailDto>(createdUser);
 
             return CreatedAtRoute("GetUser", new { controller = "Users", id = createdUser.Id }, user);
         }
@@ -51,32 +50,32 @@ namespace DatingApp.Api.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login(UserLoginDto userLoginDto)
         {
-            var userFromRepo = await _repo.Login(userLoginDto.Username, userLoginDto.Password);
+            User userFromRepo = await _repo.Login(userLoginDto.Username, userLoginDto.Password);
 
             if (userFromRepo == null)
                 return Unauthorized();
 
-            var claims = new[]
+            Claim[] claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
                 new Claim(ClaimTypes.Name, userFromRepo.UserName)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _config.GetSection("AppSettings:Token").Value));
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = creds
             };
 
-            var tokenhandler = new JwtSecurityTokenHandler();
+            JwtSecurityTokenHandler tokenhandler = new JwtSecurityTokenHandler();
 
-            var token = tokenhandler.CreateToken(tokenDescriptor);
+            SecurityToken token = tokenhandler.CreateToken(tokenDescriptor);
 
             return Ok(new
             {

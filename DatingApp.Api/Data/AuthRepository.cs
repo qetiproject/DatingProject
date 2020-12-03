@@ -1,7 +1,6 @@
 ﻿using DatingApp.Api.Models;
 using DatingApp.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Threading.Tasks;
 
 namespace DatingApp.Api.Data
@@ -15,7 +14,7 @@ namespace DatingApp.Api.Data
         }
         public async Task<User> Login(string username, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
             if (user == null)
                 return null;
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
