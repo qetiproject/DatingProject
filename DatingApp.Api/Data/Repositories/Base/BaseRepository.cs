@@ -45,7 +45,7 @@ namespace DatingApp.Api.Data
 
         public async Task<User> GetUser(int id)
         {
-            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(u => u.Id == id);
+            User user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(u => u.Id == id);
             return user;
         }
 
@@ -72,8 +72,8 @@ namespace DatingApp.Api.Data
 
             if (userParams.MinAge != 18 || userParams.MaxAge != 99)
             {
-                var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
-                var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+                DateTime minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
+                DateTime maxDob = DateTime.Today.AddYears(-userParams.MinAge);
 
                 users = users.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
             }
