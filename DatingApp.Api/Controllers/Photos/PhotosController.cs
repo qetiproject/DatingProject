@@ -19,11 +19,11 @@ namespace DatingApp.Api.Controllers
     [ApiController]
     public class PhotosController : ControllerBase
     {
-        private readonly IdatingRepository _repo;
+        private readonly IBaseRepository _repo;
         private readonly IMapper _mapper;
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
-        public PhotosController(IdatingRepository repo, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig)
+        public PhotosController(IBaseRepository repo, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig)
         {
             _repo = repo;
             _mapper = mapper;

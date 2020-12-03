@@ -18,9 +18,9 @@ namespace DatingApp.Api.Controllers
     [ApiController]
     public class MessagesController : ControllerBase
     {
-        private readonly IdatingRepository _repo;
+        private readonly IBaseRepository _repo;
         private readonly IMapper _mapper;
-        public MessagesController(IdatingRepository repo, IMapper mapper)
+        public MessagesController(IBaseRepository repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;

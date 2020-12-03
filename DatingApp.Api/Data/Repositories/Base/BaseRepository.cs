@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace DatingApp.Api.Data
 {
-    public class DatingRepository : IdatingRepository
+    public class BaseRepository : IBaseRepository
     {
         private readonly DataContext _context;
-        public DatingRepository(DataContext context)
+        public BaseRepository(DataContext context)
         {
             _context = context;
         }
