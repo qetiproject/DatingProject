@@ -28,17 +28,8 @@ namespace DatingApp.Api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
+        public async Task<IActionResult> GetUsers([FromQuery] UserParams userParams)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            User user = await _repo.GetUser(userId);
-
-            if(string.IsNullOrEmpty(userParams.Gender))
-            {
-                userParams.Gender = user.Gender == "male" ? "female" : "male";
-            }
-
             PagedList<User> users = await _repo.GetUsers(userParams);
 
             IEnumerable<UsersDto> userToReturn = _mapper.Map<IEnumerable<UsersDto>>(users);
@@ -47,6 +38,40 @@ namespace DatingApp.Api.Controllers
             return Ok(userToReturn);
         }
 
+        [HttpGet("filteredUsers")]
+        public async Task<IActionResult> GetUsersFiltered([FromQuery] UserParams userParams)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            User user = await _repo.GetUser(userId);
+
+            if (string.IsNullOrEmpty(userParams.Gender))
+            {
+                userParams.Gender = user.Gender == "male" ? "female" : "male";
+            }
+
+            PagedList<User> users = await _repo.GetUsersFiltered(userParams);
+
+            IEnumerable<UsersDto> userToReturn = _mapper.Map<IEnumerable<UsersDto>>(users);
+
+            Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+            return Ok(userToReturn);
+        }
+
+        //[HttpGet("userLikes")]
+        //public  Task<IActionResult> GetUserLikes([FromQuery] UserParams userParams)
+        //{
+        //    //var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+        //    //User user = await _repo.GetUser(userId);
+
+        //    //PagedList<User> users = await _repo.GetUsers(userParams);
+
+        //    //IEnumerable<UsersDto> userToReturn = _mapper.Map<IEnumerable<UsersDto>>(users);
+
+        //    //Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+        //    return Ok(userToReturn);
+        //}
 
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)

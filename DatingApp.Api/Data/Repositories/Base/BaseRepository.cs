@@ -51,24 +51,56 @@ namespace DatingApp.Api.Data
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)
         {
+            var users = _context.Users.Include(p => p.Photos);
+
+            //users = users.Where(u => u.Id != userParams.UserId);
+
+            //users = users.Where(u => u.Gender == userParams.Gender);
+
+            //if (userParams.Likers)
+            //{
+            //    var userLikers = await GetUserLikes(userParams.UserId, userParams.Likers);
+            //    users = users.Where(u => userLikers.Contains(u.Id));
+            //}
+
+            //if (userParams.Likes)
+            //{
+            //    var userLikes = await GetUserLikes(userParams.UserId, userParams.Likers);
+            //    users = users.Where(u => userLikes.Contains(u.Id));
+            //}
+
+            //if (userParams.MinAge != 18 || userParams.MaxAge != 99)
+            //{
+            //    DateTime minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
+            //    DateTime maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+
+            //    users = users.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+            //}
+
+            //if (!string.IsNullOrEmpty(userParams.OrderBy))
+            //{
+            //    switch (userParams.OrderBy)
+            //    {
+            //        case "created":
+            //            users = users.OrderByDescending(u => u.Created);
+            //            break;
+            //        default:
+            //            users = users.OrderByDescending(u => u.LastActive);
+            //            break;
+            //    }
+            //}
+
+            return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<PagedList<User>> GetUsersFiltered(UserParams userParams)
+        {
             var users = _context.Users.Include(p => p.Photos)
                 .OrderByDescending(u => u.LastActive).AsQueryable();
 
             users = users.Where(u => u.Id != userParams.UserId);
 
             users = users.Where(u => u.Gender == userParams.Gender);
-
-            if (userParams.Likers)
-            {
-                var userLikers = await GetUserLikes(userParams.UserId, userParams.Likers);
-                users = users.Where(u => userLikers.Contains(u.Id));
-            }
-
-            if (userParams.Likes)
-            {
-                var userLikes = await GetUserLikes(userParams.UserId, userParams.Likers);
-                users = users.Where(u => userLikes.Contains(u.Id));
-            }
 
             if (userParams.MinAge != 18 || userParams.MaxAge != 99)
             {
@@ -89,10 +121,56 @@ namespace DatingApp.Api.Data
                         users = users.OrderByDescending(u => u.LastActive);
                         break;
                 }
-             }
-            
+            }
+
             return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
         }
+
+        //error
+        //public async Task<PagedList<User>> GetUsersLike(UserParams userParams)
+        //{
+        //    //var users = _context.Users.Include(p => p.Photos)
+        //    //    .OrderByDescending(u => u.LastActive).AsQueryable();
+
+        //    //users = users.Where(u => u.Id != userParams.UserId);
+
+        //    //users = users.Where(u => u.Gender == userParams.Gender);
+
+        //    //if (userParams.Likers)
+        //    //{
+        //    //    var userLikers = await GetUserLikes(userParams.UserId, userParams.Likers);
+        //    //    users = users.Where(u => userLikers.Contains(u.Id));
+        //    //}
+
+        //    //if (userParams.Likes)
+        //    //{
+        //    //    var userLikes = await GetUserLikes(userParams.UserId, userParams.Likers);
+        //    //    users = users.Where(u => userLikes.Contains(u.Id));
+        //    //}
+
+        //    //if (userParams.MinAge != 18 || userParams.MaxAge != 99)
+        //    //{
+        //    //    DateTime minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
+        //    //    DateTime maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+
+        //    //    users = users.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+        //    //}
+
+        //    //if (!string.IsNullOrEmpty(userParams.OrderBy))
+        //    //{
+        //    //    switch (userParams.OrderBy)
+        //    //    {
+        //    //        case "created":
+        //    //            users = users.OrderByDescending(u => u.Created);
+        //    //            break;
+        //    //        default:
+        //    //            users = users.OrderByDescending(u => u.LastActive);
+        //    //            break;
+        //    //    }
+        //    //}
+
+        //    return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
+        //}
 
         //error
         private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)

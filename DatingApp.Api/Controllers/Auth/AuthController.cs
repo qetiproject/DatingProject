@@ -79,7 +79,9 @@ namespace DatingApp.Api.Controllers
 
             return Ok(new
             {
-                token = tokenhandler.WriteToken(token)
+                token = tokenhandler.WriteToken(token),
+                username = userFromRepo.UserName,
+                knownAs = userFromRepo.KnownAs
             });
         }
 
