@@ -58,21 +58,6 @@ namespace DatingApp.Api.Controllers
             return Ok(userToReturn);
         }
 
-        //[HttpGet("userLikes")]
-        //public  Task<IActionResult> GetUserLikes([FromQuery] UserParams userParams)
-        //{
-        //    //var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-        //    //User user = await _repo.GetUser(userId);
-
-        //    //PagedList<User> users = await _repo.GetUsers(userParams);
-
-        //    //IEnumerable<UsersDto> userToReturn = _mapper.Map<IEnumerable<UsersDto>>(users);
-
-        //    //Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
-        //    return Ok(userToReturn);
-        //}
-
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
@@ -80,7 +65,6 @@ namespace DatingApp.Api.Controllers
             UserDetailDto userToReturn = _mapper.Map<UserDetailDto>(user);
             return Ok(userToReturn);
         }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateDto userUpdate)
