@@ -1,7 +1,7 @@
 ﻿using DatingApp.Api.Models;
 using System.Threading.Tasks;
 
-namespace DatingApp.Api.Data
+namespace DatingApp.Api.Data.Base
 {
     public interface IBaseRepository
     {

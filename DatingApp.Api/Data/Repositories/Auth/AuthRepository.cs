@@ -3,7 +3,7 @@ using DatingApp.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-namespace DatingApp.Api.Data
+namespace DatingApp.Api.Data.Auth
 {
     public class AuthRepository : IAuthRepository
     {

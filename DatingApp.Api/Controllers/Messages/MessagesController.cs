@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DatingApp.Api.Data;
+using DatingApp.Api.Data.Base;
 using DatingApp.Api.Data.Repositories;
 using DatingApp.Api.Dtos;
 using DatingApp.Api.Helpers;

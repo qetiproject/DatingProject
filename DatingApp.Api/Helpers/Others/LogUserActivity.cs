@@ -1,11 +1,11 @@
-﻿using DatingApp.Api.Data;
+﻿using DatingApp.Api.Data.Base;
+using DatingApp.Api.Data.Repositories;
+using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using DatingApp.Api.Models;
-using DatingApp.Api.Data.Repositories;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace DatingApp.Api.Helpers
 {
