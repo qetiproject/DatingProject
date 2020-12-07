@@ -1,5 +1,6 @@
 using AutoMapper;
 using DatingApp.Api.Data;
+using DatingApp.Api.Data.Repositories;
 using DatingApp.Api.Helpers;
 using DatingApp.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,6 +42,7 @@ namespace DatingApp.Api
             services.AddAutoMapper(typeof(BaseRepository).Assembly);
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IBaseRepository, BaseRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -53,6 +55,7 @@ namespace DatingApp.Api
                         ValidateAudience = false,
                     };
                 });
+
             services.AddScoped<LogUserActivity>();
         }
 

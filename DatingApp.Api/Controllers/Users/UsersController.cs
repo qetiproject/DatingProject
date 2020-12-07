@@ -82,7 +82,6 @@ namespace DatingApp.Api.Controllers
             throw new Exception($"Updating user {id} failed on save");
         }
 
-
         [HttpPost("{id}/like/{recipientId}")]
         public async Task<IActionResult> LikeUser(int id, int recipientId)
         {
