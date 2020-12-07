@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using DatingApp.Api.Models;
+using DatingApp.Api.Data.Repositories;
 
 namespace DatingApp.Api.Helpers
 {
@@ -15,7 +16,8 @@ namespace DatingApp.Api.Helpers
             ActionExecutedContext resultContext = await next();
             var userId = int.Parse(resultContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             IBaseRepository repo = resultContext.HttpContext.RequestServices.GetService<IBaseRepository>();
-            User user = await repo.GetUser(userId);
+            IUserRepository userRepo = resultContext.HttpContext.RequestServices.GetService<IUserRepository>();
+            User user = await userRepo.GetUser(userId);
             user.LastActive = DateTime.Now;
             await repo.saveAll();
         }

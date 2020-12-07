@@ -18,10 +18,14 @@ namespace DatingApp.Api.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthRepository _repo;
-
         public IConfiguration _config;
         private IMapper _mapper;
-        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
+
+        public AuthController(
+            IAuthRepository repo, 
+            IConfiguration config, 
+            IMapper mapper
+        )
         {
             _repo = repo;
             _config = config;

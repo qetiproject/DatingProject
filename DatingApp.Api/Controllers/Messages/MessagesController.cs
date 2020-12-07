@@ -20,13 +20,47 @@ namespace DatingApp.Api.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly IBaseRepository _repo;
-        private readonly IMapper _mapper;
         private readonly IMessageRepository _messageRepository;
-        public MessagesController(IBaseRepository repo, IMapper mapper, IMessageRepository messageRepository)
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+
+        public MessagesController(
+            IBaseRepository repo,
+            IUserRepository userRepository,
+            IMapper mapper, 
+            IMessageRepository messageRepository
+        )
         {
             _repo = repo;
-            _mapper = mapper;
             _messageRepository = messageRepository;
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateMessage(int userId, MessageCreateDto messageCreateDto)
+        {
+            var sender = await _userRepository.GetUser(userId);
+            if (sender.Id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            messageCreateDto.SenderId = userId;
+
+            User recipient = await _userRepository.GetUser(messageCreateDto.RecipientId);
+
+            if (recipient == null)
+                return BadRequest("Could not find user");
+
+            Message message = _mapper.Map<Message>(messageCreateDto);
+
+            _repo.Add(message);
+
+            if (await _repo.saveAll())
+            {
+                var messageToReturn = _mapper.Map<MessageDto>(message);
+                return CreatedAtRoute("GetMessage", new { userId, id = message.Id }, messageToReturn);
+            }
+            throw new Exception("Creating the message failed on save");
         }
 
         [HttpGet("{id}", Name = "GetMessage")]
@@ -61,45 +95,6 @@ namespace DatingApp.Api.Controllers
             return Ok(messages);
         }
 
-        [HttpGet("thread/{recipientId}")]
-        public async Task<IActionResult> GetMessageThread(int userId, int recipientId)
-        {
-            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                return Unauthorized();
-
-            IEnumerable<Message> messageFromRepo = await _messageRepository.GetMessageThread(userId, recipientId);
-
-            IEnumerable<MessageDto> messageThread = _mapper.Map<IEnumerable<MessageDto>>(messageFromRepo);
-
-            return Ok(messageThread);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateMessage(int userId, MessageCreateDto messageCreateDto)
-        {
-            var sender = await _repo.GetUser(userId);
-            if (sender.Id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                return Unauthorized();
-
-            messageCreateDto.SenderId = userId;
-
-            User recipient = await _repo.GetUser(messageCreateDto.RecipientId);
-
-            if (recipient == null)
-                return BadRequest("Could not find user");
-
-            Message message = _mapper.Map<Message>(messageCreateDto);
-
-            _repo.Add(message);
-
-            if(await _repo.saveAll())
-            {
-                var messageToReturn = _mapper.Map<MessageDto>(message);
-                return CreatedAtRoute("GetMessage", new { userId, id = message.Id }, messageToReturn);
-            }
-            throw new Exception("Creating the message failed on save");
-        }
-
         [HttpPost("{id}/read")]
         public async Task<IActionResult> MarkMessageAsRead(int userId, int id)
         {
@@ -117,6 +112,19 @@ namespace DatingApp.Api.Controllers
             await _repo.saveAll();
 
             return NoContent();
+        }
+
+        [HttpGet("thread/{recipientId}")]
+        public async Task<IActionResult> GetMessageThread(int userId, int recipientId)
+        {
+            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            IEnumerable<Message> messageFromRepo = await _messageRepository.GetMessageThread(userId, recipientId);
+
+            IEnumerable<MessageDto> messageThread = _mapper.Map<IEnumerable<MessageDto>>(messageFromRepo);
+
+            return Ok(messageThread);
         }
 
         [HttpDelete]

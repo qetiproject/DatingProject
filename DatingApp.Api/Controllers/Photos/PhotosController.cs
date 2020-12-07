@@ -2,6 +2,7 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using DatingApp.Api.Data;
+using DatingApp.Api.Data.Repositories;
 using DatingApp.Api.Dtos;
 using DatingApp.Api.Helpers;
 using DatingApp.Api.Models;
@@ -20,13 +21,23 @@ namespace DatingApp.Api.Controllers
     public class PhotosController : ControllerBase
     {
         private readonly IBaseRepository _repo;
+        private readonly IUserRepository _userRepository;
+        private readonly IPhotoRepository _photoRepository;
         private readonly IMapper _mapper;
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
 
-        public PhotosController(IBaseRepository repo, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig)
+        public PhotosController(
+            IBaseRepository repo,
+            IUserRepository userRepository,
+            IPhotoRepository photoRepository,
+            IMapper mapper, 
+            IOptions<CloudinarySettings> cloudinaryConfig
+        )
         {
             _repo = repo;
+            _userRepository = userRepository;
+            _photoRepository = photoRepository;
             _mapper = mapper;
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
@@ -41,7 +52,7 @@ namespace DatingApp.Api.Controllers
         [HttpGet("{id}", Name="GetPhoto")]
         public async Task<IActionResult> GetPhoto(int id)
         {
-            Photo photoFromRepo = await _repo.GetPhoto(id);
+            Photo photoFromRepo = await _photoRepository.GetPhoto(id);
 
             PhotoDto photo = _mapper.Map<PhotoDto>(photoFromRepo);
 
@@ -58,7 +69,7 @@ namespace DatingApp.Api.Controllers
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
-            User user = await _repo.GetUser(userId);
+            User user = await _userRepository.GetUser(userId);
 
             var file = photoCreateDto.File;
 
@@ -105,17 +116,17 @@ namespace DatingApp.Api.Controllers
         {
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
-            User user = await _repo.GetUser(userId);
+            User user = await _userRepository.GetUser(userId);
 
             if (!user.Photos.Any(p => p.Id == id))
                 return Unauthorized();
 
-            Photo photo = await _repo.GetPhoto(id);
+            Photo photo = await _photoRepository.GetPhoto(id);
 
             if (photo.IsMain)
                 return BadRequest("This is already the main photo");
 
-            Photo cuurentMainPhoto = await _repo.GetmainPhotoForUser(userId);
+            Photo cuurentMainPhoto = await _photoRepository.GetmainPhotoForUser(userId);
 
             cuurentMainPhoto.IsMain = false;
 
@@ -134,12 +145,12 @@ namespace DatingApp.Api.Controllers
             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
-            User user = await _repo.GetUser(userId);
+            User user = await _userRepository.GetUser(userId);
 
             if (!user.Photos.Any(p => p.Id == id))
                 return BadRequest($"This photo is not for this user - {user.UserName}");
 
-            Photo photo = await _repo.GetPhoto(id);
+            Photo photo = await _photoRepository.GetPhoto(id);
 
             if (photo.IsMain)
                 return BadRequest("You can not delete your main photo");
