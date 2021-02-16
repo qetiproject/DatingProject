@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Net;
 
 namespace DatingApp.Api
@@ -30,6 +31,19 @@ namespace DatingApp.Api
             services.AddCors();
             services.AddIdentitynServices(Configuration);
             services.AddScoped<LogUserActivity>();
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("DatingApp", new Microsoft.OpenApi.Models.OpenApiInfo()
+                {
+                    Title = "DatingApp",
+                    Description = "user, messages, filter, upload photos",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact()
+                    {
+                        Url = new Uri("https://www.facebook.com/qxecuriani")
+                    }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +72,15 @@ namespace DatingApp.Api
             }
 
             app.UseRouting();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/DatingApp/swagger.json", "DatingApp");
+                options.RoutePrefix = "";
+            });
+
+
             app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
             app.UseAuthentication();
             app.UseAuthorization();
